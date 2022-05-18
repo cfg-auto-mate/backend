@@ -1,14 +1,19 @@
 #  create decorators to check authentic info input, e.g. correct password, user, email
    # existing user, matching passwords, correct email, length of email, length of password and names
 
-from user_management_classes import UserDatabase
+import mysql.connector
 from flask import request, redirect
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
 
+connection = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    password='Husksql91',
+    database='charge_and_go')
 
 
-db = UserDatabase
+
 #
 # login_manager = LoginManager()
 # login_manager.login_view = '/login'
