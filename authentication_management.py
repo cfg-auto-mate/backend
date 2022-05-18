@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 connection = mysql.connector.connect(
     host='localhost',
     user='root',
-    password='Husksql91',
+    password='YOUROWNPASSWORD',
     database='charge_and_go')
 
 
