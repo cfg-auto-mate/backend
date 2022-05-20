@@ -6,6 +6,7 @@ To install mysql.connector, run `pip install mysql-connector-python`
 
 from flask import Flask, jsonify, request, session, redirect, render_template, make_response, flash
 from datetime import timedelta
+from flask_cors import CORS
 from authentication_management import *
 from user_management import *
 from route_management import *
@@ -16,10 +17,18 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Temporary Secretkey'
 app.permanent_session_lifetime = timedelta(days=2)
 
+cors = CORS(app)
 
 @app.get('/')
 def intro():
     return render_template('base.html')
+
+import requests
+@app.get('/test/<lat>/<lng>')
+def test(lat, lng):
+    response = requests.get(f"https://chargepoints.dft.gov.uk/api/retrieve/registry/lat/{lat}/long/{lng}/dist/10/format/json")
+    data = response.json()["ChargeDevice"]
+    return jsonify(data)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
