@@ -1,17 +1,25 @@
 from authentication_management import connection
 
 
-def create_a_route(id, user_id, label, from_add, to_add, favourite):
-    with connection.cursor() as cursor:
+def create_new_route(user_id, label, from_add, to_add, favourite):
+    with connection.cursor(dictionary=True) as cursor:
         cursor.execute("""INSERT INTO route
-                              (id, user_id, label, from_add, to_add, favourite)
-                              VALUES
-                              (%s, %s, %s, %s, %s, %s);""", (id, user_id, label, from_add, to_add, favourite))
+                          (user_id, label, from_add, to_add, favourite)
+                          VALUES
+                          (%s, %s, %s, %s, %s);""", (user_id, label, from_add, to_add, favourite))
+        connection.commit()
+
+
+def update_new_route(from_add, to_add, user_id):
+    with connection.cursor(dictionary=True) as cursor:
+        cursor.execute("""UPDATE route
+                          SET from_add = %s, to_add = %s
+                          WHERE user_id = %s""", (from_add, to_add, user_id))
         connection.commit()
 
 
 def show_selected_route(id):
-    with connection.cursor() as cursor:
+    with connection.cursor(dictionary=True) as cursor:
         cursor.execute("""SELECT r.from_add as START, r.to_add as END, c.name as CHARGING_STOP
                           FROM route r
                           JOIN route_plan_stop p

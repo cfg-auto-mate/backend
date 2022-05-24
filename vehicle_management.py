@@ -2,7 +2,7 @@ from authentication_management import connection
 
 
 def add_new_car(user_id, make, model, registration):
-    with connection.cursor() as cursor:
+    with connection.cursor(dictionary=True) as cursor:
         cursor.execute("""INSERT INTO e_vehicle
                           (user_id, make, model, registration)
                           VALUES
@@ -11,7 +11,7 @@ def add_new_car(user_id, make, model, registration):
 
 
 def show_vehicle_info(id):
-    with connection.cursor() as cursor:
+    with connection.cursor(dictionary=True) as cursor:
         cursor.execute("""SELECT e.make, e.model, e.registration
                               FROM e_vehicle e
                               JOIN user u
