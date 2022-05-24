@@ -44,4 +44,4 @@ def delete_existing_user(email):
 
 # print(signin_existing_user('ayan-email@email.com', 'password1234'))
 # print(check_if_user_exists('ayan-email@email.com', 'password1234'))
-print(display_user_information(1))
+# print(display_user_information(1))
