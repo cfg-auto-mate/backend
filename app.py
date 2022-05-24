@@ -1,11 +1,6 @@
-"""
-INSTALLATION GUIDE
-To install flask, run `pip install flask`
-To install mysql.connector, run `pip install mysql-connector-python`
-"""
-
-from flask import Flask, jsonify, request, session, redirect, render_template, make_response, flash
-from datetime import timedelta
+from flask import Flask, jsonify, request, session, flash
+import requests
+import json
 from flask_cors import CORS
 from authentication_management import *
 from user_management import *
@@ -15,20 +10,18 @@ from rating_management import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Temporary Secretkey'
-app.permanent_session_lifetime = timedelta(days=2)
 
 cors = CORS(app)
 
-@app.get('/')
-def intro():
-    return render_template('base.html')
 
-import requests
-@app.get('/test/<lat>/<lng>')
-def test(lat, lng):
+@app.get('/charging-stations/<lat>/<lng>')
+def charging_stations(lat, lng):
     response = requests.get(f"https://chargepoints.dft.gov.uk/api/retrieve/registry/lat/{lat}/long/{lng}/dist/10/format/json")
     data = response.json()["ChargeDevice"]
     return jsonify(data)
+
+
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -40,8 +33,29 @@ def signup_new_user():
         email = request.form.get('email')
         password = request.form.get('password')
         signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password)
-        return redirect('login')
-    return render_template('signup.html')
+        return jsonify(signup_user)
+    else:
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        date_of_birth = request.form.get('date_of_birth')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password)
+    return jsonify(signup_user)
+
+
+@app.route('/vehicle', methods=['GET', 'POST'])
+def add_new_car():
+    url = "https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles"
+
+    payload = "{\n\t\"registrationNumber\": \"AA19AAA\"\n}"
+    headers = {
+        'x-api-key': 'WROj3JnkS19XuIs7qWWt99Myxf9WO4NP9EvGIDEL',
+        'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    return response
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -50,33 +64,18 @@ def login_user():
         email = request.form.get('email')
         password = request.form.get('password')
         signin_user = signin_existing_user(email=email, password=password)
-        if signin_user is not None:
-            session['loggedin'] = True
-            session['id'] = signin_user[0]
-            session['firstname'] = signin_user[1]
-            flash(f"Successful login! Welcome back {session['firstname']}", category='success')
-            return redirect('/user')
-        else:
-            flash("User doesn't exist!", category='error')
-    return render_template('login.html')
-
-
-@app.get('/user')
-def get_user_information():
-    return render_template('user.html', id=session['id'])
+        return jsonify(signin_user)
+    else:
+        email = 'ayan-email@email.com'
+        password = 'password1234'
+        signin_user = signin_existing_user(email=email, password=password)
+    return jsonify(signin_user)
 
 
 @app.get('/user/<int:id>')
 def view_user_information(id):
     user = display_user_information(id)
     return jsonify(user)
-
-
-@app.get('/route')
-def get_route_information():
-    if 'loggedin' in session:
-        return render_template('route.html', id=session['id'])
-    return render_template('login.html')
 
 
 @app.route('/route', methods=['GET', 'POST'])
@@ -88,33 +87,23 @@ def select_new_route():
         from_add = request.form.get('from_add')
         to_add = request.form.get('to_add')
         favourite = request.form.get('favourite')
-        new_route = create_a_route(id=id, user_id=user_id, label=label, from_add=from_add, to_add=to_add, favourite=favourite)
-        flash('Creating your new journey!', category='success')
-        return redirect('/route/<search_string>')
-    return render_template('signup.html')
+        new_route = create_new_route(id=id, user_id=user_id, label=label, from_add=from_add, to_add=to_add, favourite=favourite)
+        return jsonify(new_route)
+    else:
+        id = request.form.get('id')
+        user_id = request.form.get('user_id')
+        label = request.form.get('label')
+        from_add = request.form.get('from_add')
+        to_add = request.form.get('to_add')
+        favourite = request.form.get('favourite')
+        new_route = create_new_route(id=id, user_id=user_id, label=label, from_add=from_add, to_add=to_add, favourite=favourite)
+    return jsonify(new_route)
 
 
 @app.get('/route/<int:id>')
 def display_selected_route(id):
     route = show_selected_route(id)
     return jsonify(route)
-
-
-@app.get('/vehicle')
-def show_vehicle_info():
-    return render_template('vehicle.html')
-
-
-@app.route('/vehicle', methods=['GET', 'POST'])
-def add_new_car():
-    if request.method == ['POST']:
-        make = request.form.get('make')
-        model = request.form.get('model')
-        registration = request.form.get('registration')
-        add_vehicle = add_new_car(make=make, model=model, registration=registration)
-        flash('New car added to your profile!', category='success')
-        redirect('vehicle/<int:vehicle_id>')
-    return render_template('vehicle.html')
 
 
 @app.get('/vehicle/<int:id>')
@@ -134,7 +123,7 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('firstname', None)
-    return redirect('/')
+    return session.pop
 
 
 app.run(debug=True)

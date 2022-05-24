@@ -2,7 +2,7 @@ from authentication_management import connection
 
 
 def add_new_user(first_name, last_name, date_of_birth, email, password):
-    with connection.cursor() as cursor:
+    with connection.cursor(dictionary=True) as cursor:
         cursor.execute("""INSERT INTO user
                             (first_name, last_name, date_of_birth, email, password)
                             VALUES
@@ -10,42 +10,28 @@ def add_new_user(first_name, last_name, date_of_birth, email, password):
         connection.commit()
 
 
-# check if user exists to create session based on user id
-# use the flask_login module instead for user authentication?
-def check_if_user_exists(email, password):
-    with connection.cursor() as cursor:
-        cursor.execute("""SELECT *
-                              FROM user
-                              WHERE email = %s
-                              AND
-                              password = %s""", (email, password))
-        results = cursor.fetchone()
-        return results
-
-
 def signin_existing_user(email, password):
-    with connection.cursor() as cursor:
-        cursor.execute("""SELECT *
+    with connection.cursor(dictionary=True) as cursor:
+        cursor.execute("""SELECT email, password
                               FROM user
                               WHERE email = %s
                               AND
                               password = %s""", (email, password))
-        results = cursor.fetchone()
+        results = cursor.fetchall()
         return results
 
 
 def display_user_information(id):
-    with connection.cursor() as cursor:
-        cursor.execute("""SELECT first_name, last_name, date_of_birth, email
+    with connection.cursor(dictionary=True) as cursor:
+        cursor.execute("""SELECT CONCAT(first_name, ' ', last_name)) AS Name, email, date_of_birth, DATEDIFF(yy,CONVERT(DATE, date_of_birth),GETDATE()) AS AGE
                                FROM user
                                WHERE id = %s;""", (id,))
         results = cursor.fetchall()
-        if results is not None:
-            return results[0]
+        return results
 
 
 def delete_existing_user(email):
-    with connection.cursor() as cursor:
+    with connection.cursor(dictionary=True) as cursor:
         cursor.execute("""DELETE FROM user
                               WHERE email = %s""", (email,))
         connection.commit()
@@ -56,5 +42,6 @@ def delete_existing_user(email):
 # add_new_user('python', 'm', '2003-03-03', 'python-email@email.com', 'password1234')
 # print(add_new_user())
 
+# print(signin_existing_user('ayan-email@email.com', 'password1234'))
 # print(check_if_user_exists('ayan-email@email.com', 'password1234'))
-# print(display_user_information(1)
+print(display_user_information(1))
