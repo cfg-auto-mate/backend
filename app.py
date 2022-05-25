@@ -44,18 +44,18 @@ def signup_new_user():
     return jsonify(signup_user)
 
 
-@app.route('/vehicle', methods=['GET', 'POST'])
-def add_new_car():
+@app.get('/vehicle/<reg_number>')
+def lookup_car(reg_number):
     url = "https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles"
 
-    payload = "{\n\t\"registrationNumber\": \"AA19AAA\"\n}"
+    payload = '{"registrationNumber": "' + reg_number + '"}'
     headers = {
         'x-api-key': 'WROj3JnkS19XuIs7qWWt99Myxf9WO4NP9EvGIDEL',
         'Content-Type': 'application/json'
     }
-    response = requests.request("POST", url, headers=headers, data=payload)
+    response = requests.post(url, headers=headers, data=payload)
 
-    return response
+    return jsonify(response.json())
 
 
 @app.post('/login')
