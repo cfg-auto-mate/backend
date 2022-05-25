@@ -12,7 +12,7 @@ def add_new_user(first_name, last_name, date_of_birth, email, password):
 
 def signin_existing_user(email, password):
     with connection.cursor(dictionary=True) as cursor:
-        cursor.execute("""SELECT email, password
+        cursor.execute("""SELECT id
                               FROM user
                               WHERE email = %s
                               AND

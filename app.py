@@ -58,17 +58,11 @@ def add_new_car():
     return response
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.post('/login')
 def login_user():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        signin_user = signin_existing_user(email=email, password=password)
-        return jsonify(signin_user)
-    else:
-        email = 'ayan-email@email.com'
-        password = 'password1234'
-        signin_user = signin_existing_user(email=email, password=password)
+    email = request.form.get('email')
+    password = request.form.get('password')
+    signin_user = signin_existing_user(email=email, password=password)
     return jsonify(signin_user)
 
 
