@@ -21,26 +21,14 @@ def charging_stations(lat, lng):
     return jsonify(data)
 
 
-
-
-
-@app.route('/signup', methods=['GET', 'POST'])
+@app.post('/signup')
 def signup_new_user():
-    if request.method == 'POST':
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        date_of_birth = request.form.get('date_of_birth')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password)
-        return jsonify(signup_user)
-    else:
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        date_of_birth = request.form.get('date_of_birth')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password)
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    date_of_birth = request.form.get('date_of_birth')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password)
     return jsonify(signup_user)
 
 
@@ -72,9 +60,8 @@ def view_user_information(id):
     return jsonify(user)
 
 
-@app.route('/route', methods=['GET', 'POST'])
+@app.post('/route')
 def select_new_route():
-    if request.method == ['POST']:
         id = request.form.get('id')
         user_id = request.form.get('user_id')
         label = request.form.get('label')
@@ -83,15 +70,6 @@ def select_new_route():
         favourite = request.form.get('favourite')
         new_route = create_new_route(id=id, user_id=user_id, label=label, from_add=from_add, to_add=to_add, favourite=favourite)
         return jsonify(new_route)
-    else:
-        id = request.form.get('id')
-        user_id = request.form.get('user_id')
-        label = request.form.get('label')
-        from_add = request.form.get('from_add')
-        to_add = request.form.get('to_add')
-        favourite = request.form.get('favourite')
-        new_route = create_new_route(id=id, user_id=user_id, label=label, from_add=from_add, to_add=to_add, favourite=favourite)
-    return jsonify(new_route)
 
 
 @app.get('/route/<int:id>')
