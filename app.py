@@ -10,8 +10,7 @@ from rating_management import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Temporary Secretkey'
-
-cors = CORS(app)
+CORS(app)
 
 
 @app.get('/charging-stations/<lat>/<lng>')
