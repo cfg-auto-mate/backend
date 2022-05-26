@@ -4,7 +4,7 @@ from authentication_management import connection
 def add_new_car(user_id, make, model, registration):
     with connection.cursor(dictionary=True) as cursor:
         cursor.execute("""INSERT INTO e_vehicle
-                          (user_id, make, model, registration)
+                          (user_id, make, colour, fuelType, registrationNumber)
                           VALUES
                           (%s, %s, %s, %s);""", (user_id, make, model, registration))
         connection.commit()
@@ -12,7 +12,7 @@ def add_new_car(user_id, make, model, registration):
 
 def show_vehicle_info(id):
     with connection.cursor(dictionary=True) as cursor:
-        cursor.execute("""SELECT e.make, e.model, e.registration
+        cursor.execute("""SELECT e.make, e.colour, e.fuelType, e.registrationNumber
                               FROM e_vehicle e
                               JOIN user u
                               ON e.user_id = u.id

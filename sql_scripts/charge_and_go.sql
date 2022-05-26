@@ -3,11 +3,11 @@ USE charge_and_go;
 
 CREATE TABLE user (
 	id INT PRIMARY KEY AUTO_INCREMENT,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    date_of_birth DATE NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    date_of_birth DATE,
     email VARCHAR(50) UNIQUE,
-    password VARCHAR(50) NOT NULL
+    password VARCHAR(50)
 );
 
 CREATE TABLE route (
@@ -26,15 +26,15 @@ CREATE TABLE charging_station (
 );
 
 CREATE TABLE route_plan_stop (
-	route_id INT NOT NULL,
-    charging_station_id VARCHAR(50) NOT NULL,
+	route_id INT,
+    charging_station_id VARCHAR(50),
 	FOREIGN KEY (route_id) REFERENCES route(id) ON UPDATE CASCADE,
     FOREIGN KEY (charging_station_id) REFERENCES charging_station(id) ON UPDATE CASCADE
 );
 
 CREATE TABLE rating (
 	user_id INT NOT NULL,
-    charging_station_id VARCHAR(50) NOT NULL,
+    charging_station_id VARCHAR(50),
     date DATE,
     score INT CHECK (score between 0 and 5),
     landmarks BOOLEAN,
@@ -50,7 +50,8 @@ CREATE TABLE e_vehicle (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     make VARCHAR(30),
-    model VARCHAR(30),
-    registration VARCHAR(10),
+    colour VARCHAR(30),
+    fuelType VARCHAR(30),
+    registrationNumber VARCHAR(10),
     FOREIGN KEY (user_id) REFERENCES user(id) ON UPDATE CASCADE
 );

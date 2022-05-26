@@ -29,20 +29,20 @@ def signup_new_user():
     email = request.form.get('email')
     password = request.form.get('password')
     signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password)
-    return jsonify(signup_user)
+    response = jsonify(signup_user)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 
 @app.get('/vehicle/<reg_number>')
 def lookup_car(reg_number):
     url = "https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles"
-
     payload = '{"registrationNumber": "' + reg_number + '"}'
     headers = {
         'x-api-key': 'WROj3JnkS19XuIs7qWWt99Myxf9WO4NP9EvGIDEL',
         'Content-Type': 'application/json'
     }
     response = requests.post(url, headers=headers, data=payload)
-
     return jsonify(response.json())
 
 
