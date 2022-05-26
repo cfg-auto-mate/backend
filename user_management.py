@@ -1,13 +1,28 @@
+from locale import currency
 from authentication_management import connection
+import mysql.connector
+from vehicle_management import lookup_car
 
 
-def add_new_user(first_name, last_name, date_of_birth, email, password):
+def add_new_user(first_name, last_name, date_of_birth, email, password, car_reg):
     with connection.cursor(dictionary=True) as cursor:
-        cursor.execute("""INSERT INTO user
-                            (first_name, last_name, date_of_birth, email, password)
-                            VALUES
-                            (%s, %s, %s, %s, %s);""", (first_name, last_name, date_of_birth, email, password))
-        connection.commit()
+        try:
+            cursor.execute("""INSERT INTO user
+                                (first_name, last_name, date_of_birth, email, password)
+                                VALUES
+                                (%s, %s, %s, %s, %s);""", (first_name, last_name, date_of_birth, email, password))
+            connection.commit()
+            user_id = cursor.lastrowid
+            car_details = lookup_car(car_reg.replace(' ', ''))
+            cursor.execute("""INSERT INTO e_vehicle
+                              (user_id, make, colour, registrationNumber)
+                              VALUES
+                              (%s, %s, %s, %s);""", (user_id, car_details['make'], car_details['colour'], car_reg))
+            connection.commit()
+        except (mysql.connector.IntegrityError, mysql.connector.DataError):
+            return {'status': 'failure'}
+        else:
+            return {'status': 'success'}
 
 
 def signin_existing_user(email, password):
@@ -17,16 +32,16 @@ def signin_existing_user(email, password):
                               WHERE email = %s
                               AND
                               password = %s""", (email, password))
-        results = cursor.fetchall()
+        results = cursor.fetchone()
         return results
 
 
 def display_user_information(id):
     with connection.cursor(dictionary=True) as cursor:
-        cursor.execute("""SELECT CONCAT(first_name, ' ', last_name)) AS Name, email, date_of_birth, DATEDIFF(yy,CONVERT(DATE, date_of_birth),GETDATE()) AS AGE
+        cursor.execute("""SELECT CONCAT(first_name, ' ', last_name) AS name, email, date_of_birth
                                FROM user
                                WHERE id = %s;""", (id,))
-        results = cursor.fetchall()
+        results = cursor.fetchone()
         return results
 
 

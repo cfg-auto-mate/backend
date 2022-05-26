@@ -1,6 +1,5 @@
-from flask import Flask, jsonify, request, session, flash
+from flask import Flask, jsonify, request, session
 import requests
-import json
 from flask_cors import CORS
 from authentication_management import *
 from user_management import *
@@ -27,20 +26,9 @@ def signup_new_user():
     date_of_birth = request.form.get('date_of_birth')
     email = request.form.get('email')
     password = request.form.get('password')
-    signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password)
+    car_reg = request.form.get('car_reg')
+    signup_user = add_new_user(first_name=first_name, last_name=last_name, date_of_birth=date_of_birth, email=email, password=password, car_reg=car_reg)
     return jsonify(signup_user)
-
-
-@app.get('/vehicle/<reg_number>')
-def lookup_car(reg_number):
-    url = "https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles"
-    payload = '{"registrationNumber": "' + reg_number + '"}'
-    headers = {
-        'x-api-key': 'WROj3JnkS19XuIs7qWWt99Myxf9WO4NP9EvGIDEL',
-        'Content-Type': 'application/json'
-    }
-    response = requests.post(url, headers=headers, data=payload)
-    return jsonify(response.json())
 
 
 @app.post('/login')
@@ -54,31 +42,26 @@ def login_user():
 @app.get('/user/<int:id>')
 def view_user_information(id):
     user = display_user_information(id)
-    return jsonify(user)
+    vehicle = show_vehicle_info(id)
+    return jsonify({"user": user, "vehicle": vehicle})
 
 
 @app.post('/route')
 def select_new_route():
-        id = request.form.get('id')
-        user_id = request.form.get('user_id')
-        label = request.form.get('label')
-        from_add = request.form.get('from_add')
-        to_add = request.form.get('to_add')
-        favourite = request.form.get('favourite')
-        new_route = create_new_route(id=id, user_id=user_id, label=label, from_add=from_add, to_add=to_add, favourite=favourite)
-        return jsonify(new_route)
+    id = request.form.get('id')
+    user_id = request.form.get('user_id')
+    label = request.form.get('label')
+    from_add = request.form.get('from_add')
+    to_add = request.form.get('to_add')
+    favourite = request.form.get('favourite')
+    new_route = create_new_route(id=id, user_id=user_id, label=label, from_add=from_add, to_add=to_add, favourite=favourite)
+    return jsonify(new_route)
 
 
 @app.get('/route/<int:id>')
 def display_selected_route(id):
     route = show_selected_route(id)
     return jsonify(route)
-
-
-@app.get('/vehicle/<int:id>')
-def display_vehicle_info(id):
-    vehicle = show_vehicle_info(id)
-    return jsonify(vehicle)
 
 
 @app.get('/rating/<int:id>')
@@ -95,4 +78,4 @@ def logout():
     return session.pop
 
 
-app.run(debug=True)
+app.run(debug=True, port=4000)

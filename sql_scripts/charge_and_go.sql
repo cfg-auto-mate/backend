@@ -6,7 +6,7 @@ CREATE TABLE user (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     date_of_birth DATE NOT NULL,
-    email VARCHAR(50) UNIQUE,
+    email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(50) NOT NULL
 );
 
@@ -51,7 +51,6 @@ CREATE TABLE e_vehicle (
     user_id INT NOT NULL,
     make VARCHAR(30),
     colour VARCHAR(30),
-    fuelType VARCHAR(30),
     registrationNumber VARCHAR(10),
     FOREIGN KEY (user_id) REFERENCES user(id) ON UPDATE CASCADE
 );
