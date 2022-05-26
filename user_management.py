@@ -17,7 +17,7 @@ def add_new_user(first_name, last_name, date_of_birth, email, password, car_reg)
             cursor.execute("""INSERT INTO e_vehicle
                               (user_id, make, colour, registrationNumber)
                               VALUES
-                              (%s, %s, %s, %s);""", (user_id, car_details['make'], car_details['colour'], car_reg))
+                              (%s, %s, %s, %s);""", (user_id, car_details.get('make'), car_details.get('colour'), car_reg))
             connection.commit()
         except (mysql.connector.IntegrityError, mysql.connector.DataError):
             return {'status': 'failure'}
